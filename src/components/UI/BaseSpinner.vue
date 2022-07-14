@@ -1,0 +1,22 @@
+<template>
+ <div class="sbl-circ"></div>
+</template>
+
+<style lang="scss" scoped>
+.sbl-circ {
+  height: 48px;
+  width: 48px;
+  color: $accent3;
+  position: relative;
+  display: inline-block;
+  border: 5px solid;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: rotate 1s linear infinite; }
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0); }
+  100% {
+    transform: rotate(360deg); } }
+</style>

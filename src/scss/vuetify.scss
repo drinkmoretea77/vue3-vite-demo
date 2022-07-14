@@ -1,0 +1,161 @@
+.base-input :deep(.v-input__control) {
+  --v-input-control-height: 54px;
+}
+
+.base-input :deep(.v-field__input) {
+  opacity: 1;
+  color: $base-font-color;
+}
+.base-input :deep(.v-field--focused .v-field__outline) {
+  --v-field-border-width: 1px;
+}
+.base-input :deep(.v-field--error:not(.v-field--disabled) .v-field__outline) {
+  --v-theme-error: $error;
+  color: $error;
+  --v-field-border-width: 2px;
+}
+
+.base-input :deep(.v-field--error:not(.v-field--disabled) .v-field-label) {
+  color: $error;
+}
+
+.base-input :deep(.v-field__outline) {
+  color: $lightgrey;
+  --v-field-border-opacity: 1;
+}
+.base-input :deep(.v-label.v-field-label) {
+  color: $grey;
+  opacity: 1;
+}
+
+.base-input :deep(.v-input__details .v-messages) {
+  color: $grey;
+  --v-medium-emphasis-opacity: 1;
+}
+.base-input.v-input--error :deep(.v-input__details .v-messages) {
+  color: $error;
+}
+
+.base-file-input :deep(.v-field) {
+  --v-input-control-height: 52px;
+}
+
+.base-file-input :deep(.v-field__overlay) {
+  display: none;
+}
+
+.base-file-input :deep(.v-field__outline::after),
+.base-file-input :deep(.v-field__outline::before) {
+  display: none;
+}
+
+.base-file-input :deep(.v-field__clearable) {
+  display: none;
+}
+
+.base-file-input :deep(.v-input__control) {
+  border: 1px solid $lightgrey;
+  border-radius: 0 4px 4px 0;
+  border-left-width: 0;
+}
+
+.base-file-input :deep(.v-input__prepend) {
+  width: 83px;
+  margin-inline-end: 0;
+  padding-top: 0;
+  border-radius: 4px 0 0 4px;
+  border: 1px solid $base-font-color;
+}
+
+.base-file-input :deep(.v-field__field) {
+  padding: 8px 0;
+  align-items: center;
+}
+
+.base-file-input :deep(.v-field__input) {
+  opacity: 1;
+  padding-top: 0;
+  align-items: center;
+  color: $grey;
+}
+
+.base-file-input :deep(.v-input__details) {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  padding-left: 16px;
+}
+
+.base-file-input :deep(.v-icon) {
+  opacity: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.base-file-input :deep(.v-icon::before) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  content: "Upload";
+  font-family: $base-font-family;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+.base-file-input :deep(.v-field-label) {
+  font-size: 16px;
+  display: flex;
+  transition: none;
+}
+
+.base-file-input :deep(.v-field-label--floating) {
+  display: none;
+}
+
+.base-file-input :deep(.v-field__input) {
+  color: $base-font-color;
+}
+
+.base-file-input :deep(.v-field-label) {
+  color: $grey;
+}
+
+.base-file-input.v-input--error :deep(.v-input__prepend),
+.base-file-input.v-input--error :deep(.v-input__control) {
+  border-color: $error;
+}
+
+.base-file-input.v-input--error :deep(.v-input__prepend) {
+  border-width: 2px;
+}
+
+.base-file-input.v-input--error :deep(.v-input__control) {
+  border-width: 2px 2px 2px 0;
+}
+
+.base-file-input.v-input--error :deep(.v-input__prepend .v-icon) {
+  color: $base-font-color;
+}
+
+.base-file-input.v-input--error :deep(.v-input__details .v-messages) {
+  color: $error;
+}
+
+.base-radio :deep(.v-ripple__container),
+.base-radio :deep(.v-selection-control__input::before) {
+  display: none;
+}
+
+.base-radio :deep(.v-selection-control .v-label) {
+  opacity: 1;
+}
+
+.base-radio :deep(.v-selection-control__input > .v-icon) {
+  color: $lightgrey;
+}
+
+.base-radio :deep(.v-selection-control__input > .mdi-radiobox-marked) {
+  color: $accent3;
+}

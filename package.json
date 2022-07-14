@@ -1,0 +1,28 @@
+{
+  "name": "my-test-app",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Lysenko Alexey",
+  "description": "vue 3 + vite demo app",
+  "scripts": {
+    "serve": "vite preview",
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/font": "5.9.55",
+    "maska": "^1.5.0",
+    "roboto-fontface": "*",
+    "v-mask": "^2.3.0",
+    "vue": "^3.2.25",
+    "vuetify": "^3.0.0-beta.0",
+    "webfontloader": "^1.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.3",
+    "vite": "^2.9.9",
+    "vite-plugin-vuetify": "^1.0.0-alpha.0",
+    "vue-cli-plugin-vuetify": "~2.5.1"
+  }
+}
