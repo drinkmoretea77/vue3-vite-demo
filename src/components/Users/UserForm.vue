@@ -31,10 +31,12 @@
           ></v-text-field>
           <span class="user-form__label">Select your position</span>
           <v-radio-group v-model="position" class="base-radio">
-            <v-radio label="Frontend developer" value="frontend"></v-radio>
-            <v-radio label="Backend developer" value="backend"></v-radio>
-            <v-radio label="Designer" value="designer"></v-radio>
-            <v-radio label="QA" value="qa"></v-radio>
+            <v-radio
+              v-for="pos in positions"
+              :key="pos.id"
+              :label="pos.name"
+              :value="pos.id"
+            ></v-radio>
           </v-radio-group>
           <v-file-input
             v-model="avatar"
@@ -44,7 +46,7 @@
             show-size
             :rules="[rules.required, rules.img_size]"
           ></v-file-input>
-          <div class="spinner-container">
+          <div v-if="isLoading" class="spinner-container">
             <base-spinner></base-spinner>
           </div>
           <div class="user-form__submit">
@@ -82,6 +84,7 @@ export default {
   components: { "base-spinner": BaseSpinner },
   data() {
     return {
+      isLoading: false,
       imgSuccess,
       username: null,
       email: null,
@@ -110,13 +113,26 @@ export default {
           return phone_pattern.test(value) || "Invalid phone.";
         },
       },
-      data() {
-        return {
-          primaryColor: "#00bdd3",
-          red: "red",
-        };
-      },
     };
+  },
+  computed: {
+    positions() {
+      return this.$store.getters["auth/positions"] || [];
+    },
+  },
+  methods: {
+    async loadPositions() {
+      this.isLoading = true;
+      try {
+        await this.$store.dispatch("auth/fetchPositions");
+      } catch (error) {
+        this.error = error.message || "Something failed!";
+      }
+      this.isLoading = false;
+    },
+  },
+  created() {
+    this.loadPositions();
   },
 };
 </script>

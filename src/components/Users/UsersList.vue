@@ -4,11 +4,11 @@
       <h2 class="users__heading">Working with GET request</h2>
       <div class="users__items">
         <article class="user" v-for="(user, idx) in users" :key="idx">
-          <div class="user__avatar">
+          <div class="user__photo">
             <img
               class="user__img"
-              :src="$image(user.avatar)"
-              alt="User avatar"
+              :src="user.photo"
+              alt="User photo"
             />
           </div>
 
@@ -26,13 +26,13 @@
 
           <div class="user__info">
             <tooltip
-              :ref="'address' + idx"
-              :text="user.address"
-              :activated="checkActivated(user.id, 'address')"
+              :ref="'email' + idx"
+              :text="user.email"
+              :activated="checkActivated(user.id, 'email')"
             >
-              <div class="user__address">
+              <div class="user__email">
                 <span class="user__label">
-                  {{ user.address }}
+                  {{ user.email }}
                 </span>
               </div>
             </tooltip>
@@ -55,18 +55,20 @@
           </div>
         </article>
       </div>
-      <div class="spinner-container">
+      <div v-if="isLoading" class="spinner-container">
         <base-spinner></base-spinner>
       </div>
-      <div class="btn-more">
-        <base-button :custom-width="120">Show more</base-button>
+      <div v-show="showMore" class="btn-more">
+        <base-button  @click="loadUsers" :custom-width="120"
+          >Show more</base-button
+        >
       </div>
     </section>
   </div>
 </template>
 
 <script>
-import users from "@/store/usersData.js";
+// import users from "@/store/usersData.js";
 import tooltip from "../Utils/ToolTip.vue";
 import BaseSpinner from "../UI/BaseSpinner.vue";
 
@@ -78,10 +80,20 @@ export default {
   inject: ["checkEllipsis"],
   data() {
     return {
-      users,
       toolTipSize: 288,
       toolTipActive: [],
+      isLoading: false,
     };
+  },
+  computed: {
+    users() {
+        return this.$store.getters['users/users'] || [];
+    },
+    showMore() {
+      const totalPages = this.$store.getters['users/totalPages'];
+      const page = this.$store.getters['users/page'];
+      return !(page > totalPages);
+    }
   },
   methods: {
     addTooltips() {
@@ -97,16 +109,29 @@ export default {
         };
 
         addItem("name");
-        addItem("address");
+        addItem("email");
         addItem("position");
       });
     },
     checkActivated(id, field) {
-      const result = this.toolTipActive.find(
-        (item) => item[`id${id}${field}`]
-      ) ? true : false;
+      const result = this.toolTipActive.find((item) => item[`id${id}${field}`])
+        ? true
+        : false;
       return result;
     },
+    async loadUsers() {
+      this.isLoading = true;
+      try {
+        await this.$store.dispatch("users/fetchUsers");
+      } catch (error) {
+        this.error = error.message || "Something failed!";
+      }
+      this.isLoading = false;
+      this.addTooltips();
+    },
+  },
+  created() {
+    this.loadUsers();
   },
   mounted() {
     this.addTooltips();
@@ -159,6 +184,7 @@ export default {
     display: block;
     width: 70px;
     height: auto;
+    border-radius: 50%;
   }
 
   &__name,
@@ -188,5 +214,4 @@ export default {
   justify-content: center;
   width: 100%;
 }
-
 </style>

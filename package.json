@@ -13,11 +13,10 @@
   "dependencies": {
     "@mdi/font": "5.9.55",
     "maska": "^1.5.0",
-    "roboto-fontface": "*",
     "v-mask": "^2.3.0",
     "vue": "^3.2.25",
     "vuetify": "^3.0.0-beta.0",
-    "webfontloader": "^1.0.0"
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
