@@ -5,11 +5,7 @@
       <div class="users__items">
         <article class="user" v-for="(user, idx) in users" :key="idx">
           <div class="user__photo">
-            <img
-              class="user__img"
-              :src="user.photo"
-              alt="User photo"
-            />
+            <img class="user__img" :src="user.photo" alt="User photo" />
           </div>
 
           <tooltip
@@ -59,7 +55,7 @@
         <base-spinner></base-spinner>
       </div>
       <div v-show="showMore" class="btn-more">
-        <base-button  @click="loadUsers" :custom-width="120"
+        <base-button @click="loadUsers(false)" :custom-width="120"
           >Show more</base-button
         >
       </div>
@@ -87,13 +83,23 @@ export default {
   },
   computed: {
     users() {
-        return this.$store.getters['users/users'] || [];
+      return this.$store.getters["users/users"] || [];
     },
     showMore() {
-      const totalPages = this.$store.getters['users/totalPages'];
-      const page = this.$store.getters['users/page'];
+      const totalPages = this.$store.getters["users/totalPages"];
+      const page = this.$store.getters["users/page"];
       return !(page > totalPages);
-    }
+    },
+    isRegistered() {
+      return this.$store.getters["auth/success"] || false;
+    },
+  },
+  watch: {
+    isRegistered(val) {
+      if (val) {
+        this.loadUsers(true);
+      }
+    },
   },
   methods: {
     addTooltips() {
@@ -119,10 +125,14 @@ export default {
         : false;
       return result;
     },
-    async loadUsers() {
+    async loadUsers(update) {
       this.isLoading = true;
       try {
-        await this.$store.dispatch("users/fetchUsers");
+        if (update) {
+          await this.$store.dispatch("users/fetchUsers", { update: true });
+        } else {
+          await this.$store.dispatch("users/fetchUsers");
+        }
       } catch (error) {
         this.error = error.message || "Something failed!";
       }
@@ -131,7 +141,7 @@ export default {
     },
   },
   created() {
-    this.loadUsers();
+    this.loadUsers(true);
   },
   mounted() {
     this.addTooltips();

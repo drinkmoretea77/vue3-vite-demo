@@ -1,11 +1,16 @@
 <template>
   <div class="container">
     <section class="user-form">
-      <div class="user-form__form-container">
+      <div v-if="!isRegistered" class="user-form__form-container">
         <h2>Working with POST request</h2>
-        <v-form class="user-form__form">
+        <v-form
+          class="user-form__form"
+          v-model="valid"
+          lazy-validation
+          @submit.prevent="submitForm"
+        >
           <v-text-field
-            v-model="username"
+            v-model.trim="username"
             variant="outlined"
             label="Your name"
             class="base-input"
@@ -13,7 +18,7 @@
             :rules="[rules.required, rules.counter]"
           ></v-text-field>
           <v-text-field
-            v-model="email"
+            v-model.trim="email"
             variant="outlined"
             label="Email"
             class="base-input"
@@ -25,12 +30,16 @@
             variant="outlined"
             label="Phone"
             class="base-input"
-            hint="Please enter your phone (+380 xx xxx xxxx)"
-            v-maska="'+380 ## ### ####'"
+            hint="Please enter your phone (+380xxxxxxxxx)"
+            v-maska="'+380#########'"
             :rules="[rules.required, rules.phone]"
           ></v-text-field>
           <span class="user-form__label">Select your position</span>
-          <v-radio-group v-model="position" class="base-radio">
+          <v-radio-group
+            v-model="position"
+            :rules="[rules.selected]"
+            class="base-radio"
+          >
             <v-radio
               v-for="pos in positions"
               :key="pos.id"
@@ -39,22 +48,23 @@
             ></v-radio>
           </v-radio-group>
           <v-file-input
-            v-model="avatar"
-            accept="image/*"
+            accept="image/jpg, image/jpeg"
             label="Upload your photo"
             class="base-file-input"
-            show-size
             :rules="[rules.required, rules.img_size]"
+            :error="isAvatarInvalid"
+            :error-messages="errorMessages"
+            @change="onAvatarChange"
           ></v-file-input>
           <div v-if="isLoading" class="spinner-container">
             <base-spinner></base-spinner>
           </div>
           <div class="user-form__submit">
-            <base-button disabled>Sign up</base-button>
+            <base-button :disabled="!valid">Sign up</base-button>
           </div>
         </v-form>
       </div>
-      <div class="user-form__success-container">
+      <div v-else class="user-form__success-container">
         <h2>User successfully registered</h2>
         <div class="imgSuccess">
           <img
@@ -84,33 +94,41 @@ export default {
   components: { "base-spinner": BaseSpinner },
   data() {
     return {
+      valid: false,
       isLoading: false,
       imgSuccess,
       username: null,
       email: null,
       phone: null,
       position: null,
-      avatar: [],
+      photo: null,
+      avatar: null,
+      selected: null,
+      isAvatarInvalid: false,
       rules: {
         required: (value) => !!value || "Required.",
-        counter: (value) => value.length <= 20 || "Max 20 characters",
+        counter: (value) =>
+          (value.length >= 2 && value.length <= 60) ||
+          "Min 2 and max 60 characters",
         img_size: (value) => {
           return (
             !value ||
             !value.length ||
-            value[0].size < 20000 ||
-            "Avatar size should be less than 2 MB!"
+            value[0].size < 1024 * 1024 * 5 ||
+            "Avatar size should be less than 5 MB!"
           );
         },
         email: (value) => {
           const pattern =
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
           return pattern.test(value) || "Invalid e-mail.";
         },
         phone: (value) => {
-          const phone_pattern =
-            /(?=.*\+[0-9]{3}\s?[0-9]{2}\s?[0-9]{3}\s?[0-9]{4,5}$)/gm;
+          const phone_pattern = /^[+]{0,1}380([0-9]{9})$/gm;
           return phone_pattern.test(value) || "Invalid phone.";
+        },
+        selected: (value) => {
+          return !!value || "";
         },
       },
     };
@@ -118,6 +136,16 @@ export default {
   computed: {
     positions() {
       return this.$store.getters["auth/positions"] || [];
+    },
+    errorMessages() {
+      const result = [];
+      if (this.isAvatarInvalid) {
+        return "Photo resolution should be be 70x70";
+      }
+      return result;
+    },
+    isRegistered() {
+      return this.$store.getters["auth/success"] || false;
     },
   },
   methods: {
@@ -127,6 +155,38 @@ export default {
         await this.$store.dispatch("auth/fetchPositions");
       } catch (error) {
         this.error = error.message || "Something failed!";
+      }
+      this.isLoading = false;
+    },
+    onAvatarChange(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+      this.photo = files[0];
+      this.createAvatar(files[0]);
+    },
+    createAvatar(file) {
+      let reader = new FileReader();
+      reader.onload = (event) => {
+        const image = new Image();
+        image.src = event.target.result;
+        (image.onload = () => {
+          this.isAvatarInvalid = image.width !== 70 || image.height !== 70;
+        }),
+          (this.avatar = event.target.result);
+      };
+      reader.readAsDataURL(file);
+    },
+    async submitForm() {
+      this.isLoading = true;
+      if (this.valid) {
+        const data = {
+          name: this.username,
+          email: this.email,
+          phone: this.phone,
+          position_id: this.position,
+          photo: this.photo,
+        };
+        await this.$store.dispatch("auth/registerUser", data);
       }
       this.isLoading = false;
     },
@@ -140,6 +200,12 @@ export default {
 <style lang="scss" scoped>
 .user-form {
   margin-bottom: 50px;
+
+  &__form,
+  &__success-container {
+    max-width: 380px;
+    margin: 0 auto;
+  }
 
   &__label {
     display: block;
@@ -155,7 +221,7 @@ export default {
     margin-top: 5px;
   }
   &__submit {
-    margin-top: 50px;
+    margin-top: 12px;
     display: flex;
     width: 100%;
     justify-content: center;

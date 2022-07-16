@@ -11,6 +11,9 @@ export default {
       return 0;
     });
   },
+  updateUsers(state, payload) {
+    state.users = payload;
+  },  
   increasePage(state) {
     state.page += 1;
   },
